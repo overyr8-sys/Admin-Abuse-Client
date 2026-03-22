@@ -16,7 +16,7 @@ Optimized for the Admin Abuse clan operations on:
 This project uses the **oyvey-ported** codebase by **@cattyngmd** as its client base.
 
 **Module Credits:**
-* **Original Base Modules:** Criticals, Keypresses, Step, Reverse Step, MCF (Middle Click Friend), Fast Place, Notifications, and the HUD Editor.
+* **Original Base Modules:** Criticals, Key Pearl, Step, Reverse Step, MCF (Middle Click Friend), Fast Place, Notifications, and the HUD Editor.
 * **Custom Development:** All other modules and features were coded by **Plainguy123** for the 1.21.11 environment.
 
 ## About
