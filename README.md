@@ -11,6 +11,13 @@ An independent Minecraft utility client built for version 1.21.11. Developed by 
 * **6b8t.eagler.host**
 * **2b2tpvp.org**
 
+## How to Build
+To compile the client from source, follow these steps:
+1. Clone the repository: git clone https://github.com/overyr8-sys/Admin-Abuse-Client.git
+2. Open a terminal in the project folder.
+3. Run the build command: ./gradlew build
+4. The finished .jar file will be located in uild/libs/.
+
 ## Features & Modules
 
 ### Combat
