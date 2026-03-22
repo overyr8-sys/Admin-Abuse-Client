@@ -1,5 +1,4 @@
-git add README.md; git commit -m "Added Clan info and Discord links"; git push# Admin Abuse Client (1.21.11)
-
+g
 An independent Minecraft utility client built for version 1.21.11. Developed by **Plainguy123**, this is the official client for the **Admin Abuse** clan.
 
 ## Targeted Servers
