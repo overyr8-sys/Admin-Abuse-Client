@@ -27,10 +27,7 @@ import me.alpha432.oyvey.features.modules.player.AutoTotem;
 import me.alpha432.oyvey.features.modules.player.FastPlaceModule;
 import me.alpha432.oyvey.features.modules.player.NoFall;
 import me.alpha432.oyvey.features.modules.player.Velocity;
-import me.alpha432.oyvey.features.modules.render.BlockHighlightModule;
-import me.alpha432.oyvey.features.modules.render.ESP;
-import me.alpha432.oyvey.features.modules.render.Nametags;
-import me.alpha432.oyvey.features.modules.render.StorageESP;
+import me.alpha432.oyvey.features.modules.render.*;
 import me.alpha432.oyvey.features.modules.combat.AutoCrystal;
 import me.alpha432.oyvey.util.traits.Jsonable;
 import me.alpha432.oyvey.util.traits.Util;
@@ -83,7 +80,6 @@ public class ModuleManager implements Jsonable, Util {
         register(new BlockHighlightModule());
         register(new ESP());
         register(new Nametags());
-        register(new StorageESP());
 
         LOGGER.info("Registered {} modules", modules.size());
 

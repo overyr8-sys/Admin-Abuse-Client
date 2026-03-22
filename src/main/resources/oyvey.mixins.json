@@ -15,7 +15,8 @@
     "render.MixinRenderTickCounter",
     "render.MixinWorldRenderer",
     "render.gui.MixinCommandSuggestions",
-    "render.gui.MixinInGameHud"
+    "render.gui.MixinInGameHud",
+    "world.MixinClientLevel"
   ],
   "injectors": {
     "defaultRequire": 1
