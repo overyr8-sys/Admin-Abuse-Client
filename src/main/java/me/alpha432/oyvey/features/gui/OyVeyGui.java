@@ -71,6 +71,9 @@ public class OyVeyGui extends Screen {
     private long openTime;
     private Module openSettingsFor = null;
     private Setting<?> listeningForBind = null;
+    private Setting<?> editingColorSetting = null;
+    private int draggingColorChannel = -1;
+    private int settingsScrollOffset = 0; // 0=R, 1=G, 2=B, 3=A
 
     private final ArrayList<Widget> widgets = new ArrayList<>();
 
@@ -276,16 +279,12 @@ public class OyVeyGui extends Screen {
                                      Module mod, int cx, int cw, int wx, int wy,
                                      int W, int H, int fh, int mh, int hh, int pd,
                                      int startY, List<Module> mods) {
-        // Find module Y position
         int modIdx = mods.indexOf(mod);
         if (modIdx < 0) return;
         int modY = startY + modIdx * mh;
 
-        // Panel appears to the right of module list, or below if no space
         int panelX = wx + W;
-        int panelW = 100;
-
-        // If it would go off screen, put it to the left of the window
+        int panelW = 110;
         if (panelX + panelW > width) panelX = wx - panelW;
 
         List<Setting<?>> settings = new ArrayList<>();
@@ -296,82 +295,107 @@ public class OyVeyGui extends Screen {
             settings.add(s);
         }
 
+        // Calculate total content height accounting for expanded color picker
+        int contentH = 14; // header
+        for (Setting<?> s : settings) {
+            contentH += 14;
+            if (s == editingColorSetting) contentH += 44; // 4 sliders * 11px
+        }
+
         int maxPanelH = height - 20;
-        int panelH = Math.min(settings.size() * 14 + 14, maxPanelH);
+        int panelH = Math.min(contentH, maxPanelH);
         int panelY = Math.max(4, Math.min(modY, height - panelH - 4));
 
-        // Panel background
+        // Clamp scroll
+        int maxScroll = Math.max(0, contentH - panelH);
+        settingsScrollOffset = Math.max(0, Math.min(settingsScrollOffset, maxScroll));
+
+        // Panel background + header
         fill(ctx, panelX, panelY, panelX + panelW, panelY + panelH, C_SET_BG);
         outline(ctx, panelX, panelY, panelW, panelH, C_BORDER);
-
-        // Panel title
         int accent = accentColor(elapsed, 0f);
         fill(ctx, panelX, panelY, panelX + panelW, panelY + 14, C_HEADER);
         fill(ctx, panelX, panelY + 13, panelX + panelW, panelY + 14, accent);
         ctx.drawString(font, mod.getDisplayName(), panelX + 4, panelY + 3, C_TEXT_PRI);
 
-        // Settings
-        for (int i = 0; i < settings.size(); i++) {
-            Setting<?> s = settings.get(i);
-            int sy = panelY + 14 + i * 14;
-            boolean hov = mx >= panelX && mx <= panelX + panelW && my >= sy && my < sy + 12;
-            if (hov) fill(ctx, panelX, sy, panelX + panelW, sy + 12, C_MOD_HOV);
+        // Scroll indicator
+        if (maxScroll > 0) {
+            int sbH = Math.max(8, (int)((float)panelH / contentH * panelH));
+            int sbY = panelY + 14 + (int)((float)settingsScrollOffset / maxScroll * (panelH - 14 - sbH));
+            fill(ctx, panelX + panelW - 3, sbY, panelX + panelW - 1, sbY + sbH, 0x44FFFFFF);
+        }
 
-            Object val = s.getValue();
+        // Clip rendering to panel bounds
+        // Render settings with scroll offset
+        int curY = panelY + 14 - settingsScrollOffset;
 
-            if (val instanceof Boolean) {
-                boolean bval = (Boolean) val;
-                // Toggle switch look
-                int switchX = panelX + panelW - 20;
-                fill(ctx, switchX, sy + 4, switchX + 14, sy + 12, bval ? (accent & 0x00FFFFFF | 0x88000000) : 0x44FFFFFF);
-                fill(ctx, bval ? switchX + 7 : switchX + 1, sy + 5, bval ? switchX + 13 : switchX + 7, sy + 11, bval ? accent : 0xFF666666);
-                ctx.drawString(font, truncate(s.getName(), panelW - 28), panelX + 4, sy + 4, bval ? C_TEXT_PRI : C_TEXT_SEC);
+        for (Setting<?> s : settings) {
+            int sy = curY;
+            int itemH = 14 + (s == editingColorSetting ? 44 : 0);
 
-            } else if (s.isNumberSetting() && s.hasRestriction()) {
-                // Mini slider
-                Number min = (Number) s.getMin(), max = (Number) s.getMax(), cur = (Number) val;
-                if (min != null && max != null) {
-                    float pct = (cur.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue());
-                    int trackX2 = panelX + 4;
-                    int trackW2 = panelW - 8;
-                    int trackY2 = sy + 11;
-                    fill(ctx, trackX2, trackY2, trackX2 + trackW2, trackY2 + 2, 0x33FFFFFF);
-                    fill(ctx, trackX2, trackY2, trackX2 + (int)(trackW2 * pct), trackY2 + 2, accent);
+            // Only render if visible in panel
+            if (sy + itemH > panelY + 14 && sy < panelY + panelH) {
+                boolean hov = mx >= panelX && mx <= panelX + panelW && my >= sy && my < sy + 14
+                        && my >= panelY + 14 && my < panelY + panelH;
+                if (hov) fill(ctx, panelX, sy, panelX + panelW, sy + 14, C_MOD_HOV);
 
-                    String label = s.getName() + " " + ChatFormatting.GRAY + formatNum(cur);
-                    ctx.drawString(font, truncate(label, panelW - 8), panelX + 4, sy + 2, C_TEXT_PRI);
+                Object val = s.getValue();
+
+                if (val instanceof Boolean) {
+                    boolean bval = (Boolean) val;
+                    int switchX = panelX + panelW - 22;
+                    fill(ctx, switchX, sy + 3, switchX + 16, sy + 11, bval ? (accent & 0x00FFFFFF | 0x88000000) : 0x44FFFFFF);
+                    fill(ctx, bval ? switchX + 8 : switchX + 1, sy + 4, bval ? switchX + 15 : switchX + 8, sy + 10, bval ? accent : 0xFF666666);
+                    ctx.drawString(font, truncate(s.getName(), panelW - 30), panelX + 4, sy + 3, bval ? C_TEXT_PRI : C_TEXT_SEC);
+
+                } else if (s.isNumberSetting() && s.hasRestriction()) {
+                    Number min = (Number) s.getMin(), max = (Number) s.getMax(), cur = (Number) val;
+                    if (min != null && max != null) {
+                        float pct = (cur.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue());
+                        int tx = panelX + 4, tw = panelW - 8;
+                        fill(ctx, tx, sy + 10, tx + tw, sy + 12, 0x33FFFFFF);
+                        fill(ctx, tx, sy + 10, tx + (int)(tw * pct), sy + 12, accent);
+                        ctx.drawString(font, truncate(s.getName() + " " + ChatFormatting.GRAY + formatNum(cur), panelW - 8), panelX + 4, sy + 2, C_TEXT_PRI);
+                    }
+
+                } else if (val instanceof Enum) {
+                    ctx.drawString(font, truncate(s.getName() + " " + ChatFormatting.GRAY + s.currentEnumName(), panelW - 14), panelX + 4, sy + 3, C_TEXT_PRI);
+                    ctx.drawString(font, "»", panelX + panelW - 10, sy + 3, accent);
+
+                } else if (val instanceof java.awt.Color) {
+                    java.awt.Color c = (java.awt.Color) val;
+                    int swatchColor = 0xFF000000 | (c.getRed() << 16) | (c.getGreen() << 8) | c.getBlue();
+                    ctx.drawString(font, truncate(s.getName(), panelW - 22), panelX + 4, sy + 3, editingColorSetting == s ? accent : C_TEXT_PRI);
+                    fill(ctx, panelX + panelW - 15, sy + 2, panelX + panelW - 3, sy + 12, swatchColor);
+                    outline(ctx, panelX + panelW - 15, sy + 2, 12, 10, editingColorSetting == s ? accent : 0x66FFFFFF);
+
+                    if (editingColorSetting == s) {
+                        String[] lbl = {"R", "G", "B", "A"};
+                        int[] vals = {c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha()};
+                        int[] barColors = {0xFFFF4444, 0xFF44FF44, 0xFF4444FF, 0xFFAAAAAA};
+                        for (int ci = 0; ci < 4; ci++) {
+                            int ty = sy + 14 + ci * 11;
+                            if (ty >= panelY + 14 && ty < panelY + panelH) {
+                                int tx = panelX + 4, tw = panelW - 8;
+                                fill(ctx, tx, ty + 3, tx + tw, ty + 8, 0x33FFFFFF);
+                                fill(ctx, tx, ty + 3, tx + (int)(tw * vals[ci] / 255f), ty + 8, barColors[ci]);
+                                ctx.drawString(font, lbl[ci] + ":" + vals[ci], tx, ty, 0xFFAAAAAA);
+                            }
+                        }
+                    }
+
+                } else if (val instanceof me.alpha432.oyvey.features.settings.Bind) {
+                    me.alpha432.oyvey.features.settings.Bind bind = (me.alpha432.oyvey.features.settings.Bind) val;
+                    String keyName = bind.getKey() <= 0 ? "NONE" : GLFW.glfwGetKeyName(bind.getKey(), 0);
+                    if (keyName == null) keyName = "KEY_" + bind.getKey();
+                    ctx.drawString(font, truncate(s.getName() + ": " + (listeningForBind == s ? "..." : keyName.toUpperCase()), panelW - 8), panelX + 4, sy + 3, listeningForBind == s ? accent : C_TEXT_PRI);
+
+                } else {
+                    ctx.drawString(font, truncate(s.getName() + ": " + val, panelW - 8), panelX + 4, sy + 3, C_TEXT_SEC);
                 }
-
-            } else if (val instanceof Enum) {
-                // Enum cycle
-                String label = s.getName() + " " + ChatFormatting.GRAY + s.currentEnumName();
-                ctx.drawString(font, truncate(label, panelW - 8), panelX + 4, sy + 4, C_TEXT_PRI);
-                // Arrow indicator
-                ctx.drawString(font, "»", panelX + panelW - 10, sy + 4, accent);
-
-            } else if (val instanceof java.awt.Color) {
-                java.awt.Color c = (java.awt.Color) val;
-                int swatchColor = 0xFF000000 | (c.getRed() << 16) | (c.getGreen() << 8) | c.getBlue();
-                // Name on left, swatch on right
-                ctx.drawString(font, truncate(s.getName(), panelW - 22), panelX + 4, sy + 3, C_TEXT_PRI);
-                fill(ctx, panelX + panelW - 15, sy + 2, panelX + panelW - 3, sy + 12, swatchColor);
-                outline(ctx, panelX + panelW - 15, sy + 2, 12, 10, 0x88FFFFFF);
-
-            } else if (val instanceof me.alpha432.oyvey.features.settings.Bind) {
-                // Keybind
-                me.alpha432.oyvey.features.settings.Bind bind = (me.alpha432.oyvey.features.settings.Bind) val;
-                String keyName = bind.getKey() <= 0 ? "NONE" : GLFW.glfwGetKeyName(bind.getKey(), 0);
-                if (keyName == null) keyName = "KEY_" + bind.getKey();
-                String label = s.getName() + ": " + keyName.toUpperCase();
-                ctx.drawString(font, truncate(label, panelW - 8), panelX + 4, sy + 4,
-                        listeningForBind == s ? accent : C_TEXT_PRI);
-                if (listeningForBind == s) {
-                    ctx.drawString(font, "...", panelX + panelW - 14, sy + 4, accent);
-                }
-
-            } else {
-                ctx.drawString(font, truncate(s.getName() + ": " + val, panelW - 8), panelX + 4, sy + 4, C_TEXT_SEC);
             }
+
+            curY += itemH;
         }
     }
 
@@ -440,7 +464,7 @@ public class OyVeyGui extends Screen {
 
                 if (mx >= cx && mx <= wx + W && my >= ry && my < ry + mh) {
                     if (btn == 0) { mod.toggle(); }
-                    if (btn == 1) { openSettingsFor = openSettingsFor == mod ? null : mod; listeningForBind = null; }
+                    if (btn == 1) { openSettingsFor = openSettingsFor == mod ? null : mod; listeningForBind = null; editingColorSetting = null; settingsScrollOffset = 0; }
                     return true;
                 }
             }
@@ -461,9 +485,8 @@ public class OyVeyGui extends Screen {
 
         int startY = wy + hh + 22;
         int modY   = startY + modIdx * mh;
-
         int panelX = wx + W;
-        int panelW = 100;
+        int panelW = 110;
         if (panelX + panelW > width) panelX = wx - panelW;
 
         List<Setting<?>> settings = new ArrayList<>();
@@ -474,46 +497,69 @@ public class OyVeyGui extends Screen {
             settings.add(s);
         }
 
-        int maxPanelH2 = height - 20;
-        int panelH = Math.min(settings.size() * 14 + 14, maxPanelH2);
+        int contentH = 14;
+        for (Setting<?> s : settings) {
+            contentH += 14;
+            if (s == editingColorSetting) contentH += 44;
+        }
+        int panelH = Math.min(contentH, height - 20);
         int panelY = Math.max(4, Math.min(modY, height - panelH - 4));
 
         if (mx < panelX || mx > panelX + panelW || my < panelY || my > panelY + panelH) return false;
 
-        for (int i = 0; i < settings.size(); i++) {
-            Setting<?> s = settings.get(i);
-            int sy = panelY + 14 + i * 14;
-            if (my < sy || my >= sy + 14) continue;
+        int curY = panelY + 14 - settingsScrollOffset;
 
-            Object val = s.getValue();
+        for (Setting<?> s : settings) {
+            int sy = curY;
+            int itemH = 14 + (s == editingColorSetting ? 44 : 0);
 
-            if (val instanceof Boolean) {
-                ((Setting<Boolean>) s).setValue(!(Boolean) val);
-                return true;
-            }
-            if (val instanceof java.awt.Color) {
-                return true;
-            }
-            if (val instanceof me.alpha432.oyvey.features.settings.Bind) {
-                listeningForBind = listeningForBind == s ? null : s;
-                return true;
-            }
-            if (s.isNumberSetting() && s.hasRestriction()) {
-                Number min = (Number) s.getMin(), max = (Number) s.getMax();
-                if (min != null && max != null) {
-                    int trackX2 = panelX + 4;
-                    int trackW2 = panelW - 8;
-                    float pct = Math.max(0, Math.min(1, (float)(mx - trackX2) / trackW2));
-                    setNumericSetting((Setting<Number>) s, pct);
+            if (my >= sy && my < sy + itemH && sy >= panelY + 14 && sy < panelY + panelH) {
+                Object val = s.getValue();
+
+                if (val instanceof Boolean) {
+                    ((Setting<Boolean>) s).setValue(!(Boolean) val);
+                    return true;
+                }
+                if (val instanceof java.awt.Color) {
+                    java.awt.Color c = (java.awt.Color) val;
+                    if (editingColorSetting == s) {
+                        int trackX2 = panelX + 4, trackW2 = panelW - 8;
+                        int[] vals = {c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha()};
+                        for (int ci = 0; ci < 4; ci++) {
+                            int ty = sy + 14 + ci * 11;
+                            if (my >= ty && my < ty + 11) {
+                                vals[ci] = Math.max(0, Math.min(255, (int)((float)(mx - trackX2) / trackW2 * 255)));
+                                ((Setting<java.awt.Color>) s).setValue(new java.awt.Color(vals[0], vals[1], vals[2], vals[3]));
+                                draggingColorChannel = ci;
+                                return true;
+                            }
+                        }
+                    }
+                    editingColorSetting = (editingColorSetting == s) ? null : s;
+                    settingsScrollOffset = 0;
+                    return true;
+                }
+                if (val instanceof me.alpha432.oyvey.features.settings.Bind) {
+                    listeningForBind = listeningForBind == s ? null : s;
+                    return true;
+                }
+                if (s.isNumberSetting() && s.hasRestriction()) {
+                    Number min = (Number) s.getMin(), max = (Number) s.getMax();
+                    if (min != null && max != null) {
+                        int trackX2 = panelX + 4, trackW2 = panelW - 8;
+                        float pct = Math.max(0, Math.min(1, (float)(mx - trackX2) / trackW2));
+                        setNumericSetting((Setting<Number>) s, pct);
+                        return true;
+                    }
+                }
+                if (val instanceof Enum) {
+                    ((Setting<Enum<?>>) s).increaseEnum();
                     return true;
                 }
             }
-            if (val instanceof Enum) {
-                ((Setting<Enum<?>>) s).increaseEnum();
-                return true;
-            }
+            curY += itemH;
         }
-        return true;
+        return true; // consumed — inside panel bounds
     }
 
     @SuppressWarnings("unchecked")
@@ -532,7 +578,7 @@ public class OyVeyGui extends Screen {
 
     @Override
     public boolean mouseReleased(MouseButtonEvent click) {
-        if (click.button() == 0) { draggingWin = false; draggingScale = false; }
+        if (click.button() == 0) { draggingWin = false; draggingScale = false; draggingColorChannel = -1; }
         return super.mouseReleased(click);
     }
 
@@ -551,7 +597,50 @@ public class OyVeyGui extends Screen {
         // Drag numeric settings
         if (GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), 0) == 1 && openSettingsFor != null) {
             dragNumericSettings((int) mx, (int) my);
+            if (editingColorSetting != null) dragColorChannel((int) mx, (int) my);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void dragColorChannel(int mx, int my) {
+        if (draggingColorChannel < 0) return;
+        Setting<?> s = editingColorSetting;
+        if (!(s.getValue() instanceof java.awt.Color)) return;
+
+        Module mod = openSettingsFor;
+        List<Module.Category> cats = OyVey.moduleManager.getCategories();
+        if (selectedCat >= cats.size()) return;
+        List<Module> mods = OyVey.moduleManager.getModulesByCategory(cats.get(selectedCat));
+        int modIdx = mods.indexOf(mod);
+        if (modIdx < 0) return;
+
+        int wx = winX, wy = winY, W = W(), hh = hh(), mh = mh();
+        int startY = wy + hh + 22;
+        int modY = startY + modIdx * mh;
+        int panelX = wx + W;
+        int panelW = 100;
+        if (panelX + panelW > width) panelX = wx - panelW;
+
+        List<Setting<?>> settings = new ArrayList<>();
+        for (Setting<?> st : mod.getSettings()) {
+            if (st.getName().equalsIgnoreCase("Enabled")) continue;
+            if (st.getName().equalsIgnoreCase("DisplayName")) continue;
+            if (!st.isVisible()) continue;
+            settings.add(st);
+        }
+        int panelH = Math.min(settings.size() * 14 + 14, height - 20);
+        int panelY = Math.max(4, Math.min(modY, height - panelH - 4));
+
+        int idx = settings.indexOf(s);
+        if (idx < 0) return;
+        int sy = panelY + 14 + idx * 14;
+        int trackX = panelX + 4;
+        int trackW = panelW - 8;
+
+        java.awt.Color c = (java.awt.Color) s.getValue();
+        int[] vals = {c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha()};
+        vals[draggingColorChannel] = Math.max(0, Math.min(255, (int)((float)(mx - trackX) / trackW * 255)));
+        ((Setting<java.awt.Color>) s).setValue(new java.awt.Color(vals[0], vals[1], vals[2], vals[3]));
     }
 
     private void dragNumericSettings(int mx, int my) {
@@ -623,6 +712,11 @@ public class OyVeyGui extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double h, double v) {
+        if (openSettingsFor != null) {
+            settingsScrollOffset -= (int)(v * 14);
+            settingsScrollOffset = Math.max(0, settingsScrollOffset);
+            return true;
+        }
         return super.mouseScrolled(mouseX, mouseY, h, v);
     }
 

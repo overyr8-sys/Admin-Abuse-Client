@@ -11,12 +11,12 @@
     "input.MixinKeyboard",
     "input.MixinMouse",
     "network.MixinClientPlayNetworkHandler",
+    "render.MixinItemInHandRenderer",
     "render.MixinLevelRenderer",
     "render.MixinRenderTickCounter",
     "render.MixinWorldRenderer",
     "render.gui.MixinCommandSuggestions",
-    "render.gui.MixinInGameHud",
-    "world.MixinClientLevel"
+    "render.gui.MixinInGameHud"
   ],
   "injectors": {
     "defaultRequire": 1

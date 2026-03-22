@@ -27,8 +27,17 @@ import me.alpha432.oyvey.features.modules.player.AutoTotem;
 import me.alpha432.oyvey.features.modules.player.FastPlaceModule;
 import me.alpha432.oyvey.features.modules.player.NoFall;
 import me.alpha432.oyvey.features.modules.player.Velocity;
-import me.alpha432.oyvey.features.modules.render.*;
+import me.alpha432.oyvey.features.modules.render.BlockHighlightModule;
+import me.alpha432.oyvey.features.modules.render.ESP;
+import me.alpha432.oyvey.features.modules.render.Nametags;
+import me.alpha432.oyvey.features.modules.render.StorageESP;
 import me.alpha432.oyvey.features.modules.combat.AutoCrystal;
+import me.alpha432.oyvey.features.modules.combat.Surround;
+import me.alpha432.oyvey.features.modules.hud.InventoryHUD;
+import me.alpha432.oyvey.features.modules.player.AutoArmor;
+import me.alpha432.oyvey.features.modules.render.Fullbright;
+import me.alpha432.oyvey.features.modules.render.HandChams;
+import me.alpha432.oyvey.features.modules.render.NewChunks;
 import me.alpha432.oyvey.util.traits.Jsonable;
 import me.alpha432.oyvey.util.traits.Util;
 import org.slf4j.Logger;
@@ -48,6 +57,7 @@ public class ModuleManager implements Jsonable, Util {
         register(new WatermarkHudModule());
         register(new CoordinatesHudModule());
         register(new ArrayListModule());
+        register(new InventoryHUD());
 
         // Client
         register(new HudEditorModule());
@@ -59,6 +69,7 @@ public class ModuleManager implements Jsonable, Util {
         register(new KillAura());
         register(new AutoCrystal());
         register(new KeyPearlModule());
+        register(new Surround());
 
         // Misc
         register(new MCFModule());
@@ -73,6 +84,7 @@ public class ModuleManager implements Jsonable, Util {
         // Player
         register(new FastPlaceModule());
         register(new AutoTotem());
+        register(new AutoArmor());
         register(new NoFall());
         register(new Velocity());
 
@@ -80,6 +92,10 @@ public class ModuleManager implements Jsonable, Util {
         register(new BlockHighlightModule());
         register(new ESP());
         register(new Nametags());
+        register(new StorageESP());
+        register(new Fullbright());
+        register(new NewChunks());
+        register(new HandChams());
 
         LOGGER.info("Registered {} modules", modules.size());
 
