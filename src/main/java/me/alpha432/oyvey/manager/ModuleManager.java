@@ -13,15 +13,25 @@ import me.alpha432.oyvey.features.modules.client.HudEditorModule;
 import me.alpha432.oyvey.features.modules.client.NotificationsModule;
 import me.alpha432.oyvey.features.modules.combat.CriticalsModule;
 import me.alpha432.oyvey.features.modules.combat.KeyPearlModule;
+import me.alpha432.oyvey.features.modules.combat.KillAura;
+import me.alpha432.oyvey.features.modules.hud.ArrayListModule;
 import me.alpha432.oyvey.features.modules.hud.CoordinatesHudModule;
 import me.alpha432.oyvey.features.modules.hud.WatermarkHudModule;
 import me.alpha432.oyvey.features.modules.misc.MCFModule;
+import me.alpha432.oyvey.features.modules.movement.ElytraFly;
+import me.alpha432.oyvey.features.modules.movement.Flight;
 import me.alpha432.oyvey.features.modules.movement.ReverseStepModule;
+import me.alpha432.oyvey.features.modules.movement.Speed;
 import me.alpha432.oyvey.features.modules.movement.StepModule;
+import me.alpha432.oyvey.features.modules.player.AutoTotem;
 import me.alpha432.oyvey.features.modules.player.FastPlaceModule;
-import me.alpha432.oyvey.features.modules.player.NoFallModule;
-import me.alpha432.oyvey.features.modules.player.VelocityModule;
+import me.alpha432.oyvey.features.modules.player.NoFall;
+import me.alpha432.oyvey.features.modules.player.Velocity;
 import me.alpha432.oyvey.features.modules.render.BlockHighlightModule;
+import me.alpha432.oyvey.features.modules.render.ESP;
+import me.alpha432.oyvey.features.modules.render.Nametags;
+import me.alpha432.oyvey.features.modules.render.StorageESP;
+import me.alpha432.oyvey.features.modules.combat.AutoCrystal;
 import me.alpha432.oyvey.util.traits.Jsonable;
 import me.alpha432.oyvey.util.traits.Util;
 import org.slf4j.Logger;
@@ -37,24 +47,46 @@ public class ModuleManager implements Jsonable, Util {
     private final List<Module> modules = new ArrayList<>();
 
     public void init() {
+        // HUD
         register(new WatermarkHudModule());
         register(new CoordinatesHudModule());
+        register(new ArrayListModule());
+
+        // Client
         register(new HudEditorModule());
         register(new ClickGuiModule());
         register(new NotificationsModule());
+
+        // Combat
         register(new CriticalsModule());
+        register(new KillAura());
+        register(new AutoCrystal());
+        register(new KeyPearlModule());
+
+        // Misc
         register(new MCFModule());
+
+        // Movement
         register(new StepModule());
         register(new ReverseStepModule());
+        register(new Flight());
+        register(new ElytraFly());
+        register(new Speed());
+
+        // Player
         register(new FastPlaceModule());
-        register(new VelocityModule());
+        register(new AutoTotem());
+        register(new NoFall());
+        register(new Velocity());
+
+        // Render
         register(new BlockHighlightModule());
-        register(new NoFallModule());
-        register(new KeyPearlModule());
+        register(new ESP());
+        register(new Nametags());
+        register(new StorageESP());
 
         LOGGER.info("Registered {} modules", modules.size());
 
-        // Create a command for each module for modules to be configurable via command line
         for (Module module : modules) {
             OyVey.commandManager.register(new ModuleCommand(module));
         }

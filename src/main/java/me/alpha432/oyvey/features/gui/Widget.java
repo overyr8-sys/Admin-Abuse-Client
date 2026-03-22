@@ -15,8 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Widget
-        extends Feature {
+public class Widget extends Feature {
     protected GuiGraphics context;
     private final List<Item> items = new ArrayList<>();
     public boolean drag;
@@ -39,9 +38,7 @@ public class Widget
     }
 
     private void drag(int mouseX, int mouseY) {
-        if (!this.drag) {
-            return;
-        }
+        if (!this.drag) return;
         this.x = this.x2 + mouseX;
         this.y = this.y2 + mouseY;
     }
@@ -51,11 +48,16 @@ public class Widget
         this.drag(mouseX, mouseY);
         float totalItemHeight = this.open ? this.getTotalItemHeight() - 2.0f : 0.0f;
         int color = ClickGuiModule.getInstance().topColor.getValue().getRGB();
-        context.fill(this.x, this.y - 1, this.x + this.width, this.y + this.height - 6, ClickGuiModule.getInstance().rainbow.getValue() ? ColorUtil.rainbow(ClickGuiModule.getInstance().rainbowHue.getValue()).getRGB() : color);
+        context.fill(this.x, this.y - 1, this.x + this.width, this.y + this.height - 6,
+                ClickGuiModule.getInstance().rainbow.getValue()
+                        ? ColorUtil.rainbow(ClickGuiModule.getInstance().rainbowHue.getValue()).getRGB()
+                        : color);
         if (this.open) {
-            RenderUtil.rect(context, this.x, (float) this.y + 12.5f, this.x + this.width, (float) (this.y + this.height) + totalItemHeight, 0x77000000);
+            RenderUtil.rect(context, this.x, (float) this.y + 12.5f, this.x + this.width,
+                    (float) (this.y + this.height) + totalItemHeight, 0x77000000);
         }
-        drawString(this.getName(), (float) this.x + 3.0f, (float) this.y - 4.0f - (float) OyVeyGui.getClickGui().getTextOffset(), -1);
+        drawString(this.getName(), (float) this.x + 3.0f,
+                (float) this.y - 4.0f - (float) OyVeyGui.getClickGui().getTextOffset(), -1);
         ScissorUtil.enable(context, x, 0, x + width, mc.getWindow().getGuiScaledHeight());
 
         if (this.open) {
@@ -64,18 +66,12 @@ public class Widget
                 if (item.isHidden()) continue;
                 item.setLocation((float) this.x + 2.0f, y);
                 item.setWidth(this.getWidth() - 4);
-                if (item.isHovering(mouseX, mouseY)) {
-                    ScissorUtil.disable(context);
-                }
+                if (item.isHovering(mouseX, mouseY)) ScissorUtil.disable(context);
                 item.drawScreen(context, mouseX, mouseY, partialTicks);
-
-                if (item.isHovering(mouseX, mouseY)) {
-                    ScissorUtil.enable(context);
-                }
+                if (item.isHovering(mouseX, mouseY)) ScissorUtil.enable(context);
                 y += (float) item.getHeight() + 2f;
             }
         }
-
         ScissorUtil.disable(context);
     }
 
@@ -83,11 +79,7 @@ public class Widget
         if (mouseButton == 0 && this.isHovering(mouseX, mouseY)) {
             this.x2 = this.x - mouseX;
             this.y2 = this.y - mouseY;
-            OyVeyGui.getClickGui().getComponents().forEach(component -> {
-                if (component.drag) {
-                    component.drag = false;
-                }
-            });
+            OyVeyGui.getClickGui().getComponents().forEach(c -> { if (c.drag) c.drag = false; });
             this.drag = true;
             return;
         }
@@ -96,26 +88,18 @@ public class Widget
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f));
             return;
         }
-        if (!this.open) {
-            return;
-        }
+        if (!this.open) return;
         this.getItems().forEach(item -> item.mouseClicked(mouseX, mouseY, mouseButton));
     }
 
     public void mouseReleased(int mouseX, int mouseY, int releaseButton) {
-        if (releaseButton == 0) {
-            this.drag = false;
-        }
-        if (!this.open) {
-            return;
-        }
+        if (releaseButton == 0) this.drag = false;
+        if (!this.open) return;
         this.getItems().forEach(item -> item.mouseReleased(mouseX, mouseY, releaseButton));
     }
 
     public void onKeyTyped(String typedChar, int keyCode) {
-        if (!this.open) {
-            return;
-        }
+        if (!this.open) return;
         this.getItems().forEach(item -> item.onKeyTyped(typedChar, keyCode));
     }
 
@@ -124,68 +108,30 @@ public class Widget
         this.getItems().forEach(item -> item.onKeyPressed(key));
     }
 
-    public void addButton(Button button) {
-        this.items.add(button);
-    }
+    public void addButton(Button button) { this.items.add(button); }
 
-    public int getX() {
-        return this.x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return this.y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getWidth() {
-        return this.width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return this.height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public boolean isHidden() {
-        return this.hidden;
-    }
-
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
-
-    public boolean isOpen() {
-        return this.open;
-    }
-
-    public final List<Item> getItems() {
-        return this.items;
-    }
+    public int     getX()               { return this.x; }
+    public void    setX(int x)          { this.x = x; }
+    public int     getY()               { return this.y; }
+    public void    setY(int y)          { this.y = y; }
+    public int     getWidth()           { return this.width; }
+    public void    setWidth(int width)  { this.width = width; }
+    public int     getHeight()          { return this.height; }
+    public void    setHeight(int h)     { this.height = h; }
+    public boolean isHidden()           { return this.hidden; }
+    public void    setHidden(boolean h) { this.hidden = h; }
+    public boolean isOpen()             { return this.open; }
+    public final List<Item> getItems()  { return this.items; }
 
     public boolean isHovering(int mouseX, int mouseY) {
-        return mouseX >= this.getX() && mouseX <= this.getX() + this.getWidth() && mouseY >= this.getY() && mouseY <= this.getY() + this.getHeight() - (this.open ? 2 : 0);
+        return mouseX >= this.x && mouseX <= this.x + this.width
+                && mouseY >= this.y && mouseY <= this.y + this.height - (this.open ? 2 : 0);
     }
 
     private float getTotalItemHeight() {
-        float height = 0.0f;
-        for (Item item : this.getItems()) {
-            height += (float) item.getHeight() + 2;
-        }
-        return height;
+        float h = 0f;
+        for (Item item : this.items) h += item.getHeight() + 2;
+        return h;
     }
 
     protected void drawString(String text, double x, double y, Color color) {

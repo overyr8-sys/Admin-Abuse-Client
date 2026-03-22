@@ -31,3 +31,4 @@ public class NotificationsModule extends Module {
                 moduleState ? "on" : "off"));
     }
 }
+

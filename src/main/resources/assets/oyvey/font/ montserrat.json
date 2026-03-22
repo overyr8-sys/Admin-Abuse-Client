@@ -1,0 +1,15 @@
+{
+  "providers": [
+    {
+      "type": "reference",
+      "id": "minecraft:default"
+    },
+    {
+      "type": "ttf",
+      "file": "oyvey:fonts/Montserrat-Regular.ttf",
+      "size": 11.0,
+      "oversample": 4.0,
+      "shift": [0, -1]
+    }
+  ]
+}

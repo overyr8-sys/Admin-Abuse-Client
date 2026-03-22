@@ -7,7 +7,7 @@ import me.alpha432.oyvey.util.BuildConfig;
 import me.alpha432.oyvey.util.TextUtil;
 
 public class WatermarkHudModule extends HudModule {
-    public Setting<String> text = str("Text", BuildConfig.NAME);
+    public Setting<String> text = str("Text", "Admin Abuse Client");
     public Setting<Boolean> fullVersion = new Setting<>("FullVersion", false);
 
     public WatermarkHudModule() {
@@ -33,4 +33,3 @@ public class WatermarkHudModule extends HudModule {
         setHeight(mc.font.lineHeight);
     }
 }
-

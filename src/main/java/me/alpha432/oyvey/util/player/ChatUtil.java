@@ -1,6 +1,5 @@
 package me.alpha432.oyvey.util.player;
 
-import me.alpha432.oyvey.OyVey;
 import me.alpha432.oyvey.features.commands.Command;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -23,11 +22,12 @@ public class ChatUtil {
         if (Command.nullCheck()) {
             return;
         }
-        // TODO add silent support ig
         mc.gui.getChat().addMessage(message);
     }
-    
+
     public static Component getClientNameComponent() {
-        return Component.empty().withColor(OyVey.colorManager.getColorAsInt()).append("OyVey");
+        return Component.empty()
+                .withColor(ChatFormatting.RED.getColor())
+                .append("AA");
     }
 }
