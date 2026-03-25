@@ -11,7 +11,6 @@
     "input.MixinKeyboard",
     "input.MixinMouse",
     "network.MixinClientPlayNetworkHandler",
-    "render.MixinItemInHandRenderer",
     "render.MixinLevelRenderer",
     "render.MixinRenderTickCounter",
     "render.MixinWorldRenderer",

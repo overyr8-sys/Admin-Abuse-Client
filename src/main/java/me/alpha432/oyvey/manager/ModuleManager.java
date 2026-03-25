@@ -36,7 +36,6 @@ import me.alpha432.oyvey.features.modules.combat.Surround;
 import me.alpha432.oyvey.features.modules.hud.InventoryHUD;
 import me.alpha432.oyvey.features.modules.player.AutoArmor;
 import me.alpha432.oyvey.features.modules.render.Fullbright;
-import me.alpha432.oyvey.features.modules.render.HandChams;
 import me.alpha432.oyvey.features.modules.render.NewChunks;
 import me.alpha432.oyvey.util.traits.Jsonable;
 import me.alpha432.oyvey.util.traits.Util;
@@ -95,7 +94,6 @@ public class ModuleManager implements Jsonable, Util {
         register(new StorageESP());
         register(new Fullbright());
         register(new NewChunks());
-        register(new HandChams());
 
         LOGGER.info("Registered {} modules", modules.size());
 

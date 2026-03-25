@@ -16,7 +16,7 @@ To compile the client from source, follow these steps:
 1. Clone the repository: git clone https://github.com/overyr8-sys/Admin-Abuse-Client.git
 2. Open a terminal in the project folder.
 3. Run the build command: ./gradlew build
-4. The finished .jar file will be located in uild/libs/.
+4. The finished \.jar\ file will be located in \uild/libs/\.
 
 ## Features & Modules
 
@@ -40,7 +40,7 @@ To compile the client from source, follow these steps:
 * **Notifications:** On-screen alerts for toggles and events.
 * **HUD Editor:** Custom placement for all on-screen elements.
 * **ESP / FullBright:** See entities through walls and remove darkness.
-* **HandChams / Nametags:** Custom rendering for players and items.
+* **Nametags:** Custom rendering for players and items.
 * **New Chunks:** Highlights recently generated chunks for base hunting.
 * **Watermark / Coordinates:** Displays client branding and location.
 
