@@ -1,22 +1,24 @@
-# Admin Abuse Client (1.21.11)
+# Admin Abuse Client (1.21.11) - BETA v1.0
 
-An independent Minecraft utility client built for version 1.21.11. Developed by **Plainguy123**, this is the official client for the **Admin Abuse** clan.
+An independent Minecraft utility client built for version 1.21.11. Developed by **Plainguy123**, this is the official **Beta Testing** client for the **Admin Abuse** clan.
+
+> [!WARNING]
+> **BETA STATUS:** This client is currently in active development and beta testing. It is NOT intended to be used as a primary/main client yet. Use at your own risk and expect frequent updates, bugs, and experimental features.
 
 ## Join the Community
 * **Client Discord:** [Join here](https://discord.gg/xhBaVqn5jq)
 * **Admin Abuse Clan Discord:** [Join here](https://discord.gg/pxKzEMzmUz)
 
-## Targeted Servers
+## Targeted Servers (Testing Grounds)
 * **play.6b6t.org**
 * **6b8t.eagler.host**
 * **2b2tpvp.org**
 
-## How to Build
-To compile the client from source, follow these steps:
-1. Clone the repository: git clone https://github.com/overyr8-sys/Admin-Abuse-Client.git
-2. Open a terminal in the project folder.
-3. Run the build command: ./gradlew build
-4. The finished \.jar\ file will be located in \uild/libs/\.
+## How to Build (Dev Only)
+To compile the beta client from source:
+1. Clone the repository: \git clone https://github.com/overyr8-sys/Admin-Abuse-Client.git\
+2. Run the build command: \./gradlew build\
+3. The finished \.jar\ file will be located in \uild/libs/\.
 
 ## Features & Modules
 
