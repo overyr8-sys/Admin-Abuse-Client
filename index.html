@@ -24,17 +24,16 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            padding: 40px 20px;
         }
 
         .container {
             max-width: 800px;
-            padding: 40px;
+            width: 100%;
             text-align: center;
-            z-index: 1;
             animation: fadeIn 0.8s ease-out;
         }
 
@@ -46,6 +45,7 @@
             border-radius: 24px;
             padding: 60px 40px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 40px;
         }
 
         .beta-badge {
@@ -63,21 +63,29 @@
             margin-bottom: 24px;
         }
 
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 900;
-            margin: 0 0 16px 0;
-            letter-spacing: -2px;
-            background: linear-gradient(to bottom, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        h1 { font-size: 3.5rem; font-weight: 900; margin: 0 0 16px 0; letter-spacing: -2px; }
+        h2 { font-size: 1.5rem; color: #fff; margin-bottom: 15px; text-align: left; border-left: 3px solid var(--accent-blue); padding-left: 15px; }
+        
+        p { font-size: 1.1rem; color: #a0a0a0; line-height: 1.6; margin-bottom: 40px; }
+
+        .info-section {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 20px;
         }
 
-        p {
-            font-size: 1.1rem;
-            color: #a0a0a0;
-            line-height: 1.6;
-            margin-bottom: 40px;
+        .code-block {
+            background: #000;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            color: #82b1ff;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            border: 1px solid #222;
         }
 
         .download-btn {
@@ -89,63 +97,46 @@
             text-decoration: none;
             font-weight: 700;
             font-size: 1.1rem;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
         }
 
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30.px rgba(255, 255, 255, 0.2);
-            filter: brightness(1.1);
-        }
+        .download-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1); }
 
-        .links {
-            margin-top: 40px;
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-        }
+        .links { margin-top: 40px; display: flex; justify-content: center; gap: 24px; }
+        .links a { color: #666; text-decoration: none; font-size: 0.9rem; }
+        .links a:hover { color: var(--accent-blue); }
 
-        .links a {
-            color: #666;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .links a:hover {
-            color: var(--accent-blue);
-        }
-
-        .blob {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: var(--accent-blue);
-            filter: blur(150px);
-            opacity: 0.1;
-            z-index: 0;
-            border-radius: 50%;
-            top: -100px;
-            left: -100px;
-        }
     </style>
 </head>
 <body>
-    <div class="blob"></div>
     <div class="container">
         <div class="glass-card">
             <div class="beta-badge">Early Access Beta</div>
             <h1>Admin Abuse</h1>
-            <p>A specialized utility suite for 1.21.11 anarchy. <br>Built for the clan, by the clan.</p>
-            
+            <p>Specialized utility suite for 1.21.11 anarchy. <br>Built for the clan, by the clan.</p>
             <a href="https://github.com/overyr8-sys/Admin-Abuse-Client/releases/download/Ver_1.0/Admin.Abuse.Client.ver.1.0.0.beta.jar" class="download-btn">Download 1.0 Beta</a>
+        </div>
 
-            <div class="links">
-                <a href="https://discord.gg/xhBaVqn5jq">Client Discord</a>
-                <a href="https://discord.gg/pxKzEMzmUz">Clan Discord</a>
-                <a href="https://github.com/overyr8-sys/Admin-Abuse-Client">Source Code</a>
+        <div class="info-section">
+            <h2>About Project</h2>
+            <p>Admin Abuse is an independent testing client designed for high-performance PC setups. It is currently in a <b>Beta</b> phase, focused on optimizing modules for 6b6t and 2b2tpvp. This is not intended to be a main client, but a testing ground for custom modules like New Chunks and specialized Auto Crystal configurations.</p>
+        </div>
+
+        <div class="info-section">
+            <h2>How to Build</h2>
+            <p>If you prefer to compile the latest dev builds yourself, use the following commands:</p>
+            <div class="code-block">
+                git clone https://github.com/overyr8-sys/Admin-Abuse-Client.git<br>
+                cd Admin-Abuse-Client<br>
+                ./gradlew build
             </div>
+            <p style="font-size: 0.9rem; margin-top: 10px;">The compiled .jar will be in <code>build/libs/</code>.</p>
+        </div>
+
+        <div class="links">
+            <a href="https://discord.gg/xhBaVqn5jq">Client Discord</a>
+            <a href="https://discord.gg/pxKzEMzmUz">Clan Discord</a>
+            <a href="https://github.com/overyr8-sys/Admin-Abuse-Client">Source Code</a>
         </div>
     </div>
 </body>
